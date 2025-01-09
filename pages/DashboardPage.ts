@@ -1,20 +1,18 @@
-import { Locator, Page } from "@playwright/test";
+import { Locator, Page } from '@playwright/test';
 
 export class DashboardPage {
   page: Page;
   productsCard: Locator;
   productNames: Locator;
-  cartBtn: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.productsCard = page.locator(".card-body");
-    this.productNames = this.productsCard.locator("b");
-    this.cartBtn = page.getByRole("button", { name: "Cart" }).first();
+    this.productsCard = page.locator('.card-body');
+    this.productNames = this.productsCard.locator('b');
   }
 
   async goto() {
-    await this.page.goto("https://rahulshettyacademy.com/client");
+    await this.page.goto('https://rahulshettyacademy.com/client');
   }
 
   async getProductNames() {
@@ -22,7 +20,16 @@ export class DashboardPage {
     return productNames;
   }
 
-  async getProductsCount() {
-    return await this.productsCard.count();
+  async addProductToCart(actualProductName: string) {
+    await this.productsCard.first().waitFor();
+    const productsCount = await this.productsCard.count();
+
+    for (let i = 0; i < productsCount; i++) {
+      let productName = await this.productNames.nth(i).textContent();
+      if (productName === actualProductName) {
+        await this.productsCard.nth(i).locator('text= Add To Cart').click();
+        break;
+      }
+    }
   }
 }
